@@ -5,6 +5,8 @@ class Settings(BaseSettings):
     APP_ENV: str
     DEBUG: bool
     
+    DATABASE_URL: str
+    
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore",
