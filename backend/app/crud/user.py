@@ -21,11 +21,13 @@ def create_user(
     username: str,
     email: str,
     hashed_password: str,
-)-> User | None:
+    role,
+) -> User:
     db_user = User(
         username=username,
         email=email,
         hashed_password=hashed_password,
+        role=role,
     )
 
     db.add(db_user)
