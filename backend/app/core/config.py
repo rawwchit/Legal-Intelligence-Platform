@@ -5,6 +5,8 @@ class Settings(BaseSettings):
     APP_ENV: str
     DEBUG: bool
     
+    QDRANT_URL: str
+    QDRANT_COLLECTION_NAME: str
     DATABASE_URL: str
     SECRET_KEY: str
     ALGORITHM: str = "HS256"

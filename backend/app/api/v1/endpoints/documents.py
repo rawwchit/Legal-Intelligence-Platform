@@ -13,6 +13,7 @@ from app.db.database import get_db
 from app.models.user import User
 from app.schemas.document import DocumentResponse
 from app.services.storage import save_uploaded_file
+from app.services.indexing_service import IndexingService
 
 router = APIRouter()
 
@@ -43,5 +44,15 @@ def upload_document(
         year=year,
         uploaded_by=current_user.id,
     )
+
+    indexing_service = IndexingService()
+
+    chunk_count = indexing_service.index_document(
+        file_path=file_path,
+        document_id=document.id,
+        filename=file_name,
+    )
+
+    print(f"Indexed {chunk_count} chunks for document {document.id}")
 
     return document
