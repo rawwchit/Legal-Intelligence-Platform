@@ -94,3 +94,4 @@ def admin_only(
         "message": "Welcome Admin!",
         "user": current_user.username,
     }
+    
