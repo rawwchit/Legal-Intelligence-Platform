@@ -9,7 +9,7 @@ class QdrantVectorStore:
     """Wrapper around Qdrant for storing and searching embeddings."""
 
     def __init__(self):
-        self.client = QdrantClient(url=settings.QDRANT_URL)
+        self.client = QdrantClient(path="storage/qdrant")
         self.collection_name = settings.QDRANT_COLLECTION_NAME
 
         collections = [c.name for c in self.client.get_collections().collections]
