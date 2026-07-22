@@ -1,6 +1,7 @@
-
-
 import csv
+from pathlib import Path
+
+from langchain_core.documents import Document
 
 from app.services.loaders.base import BaseLoader
 
@@ -8,7 +9,7 @@ from app.services.loaders.base import BaseLoader
 class CSVLoader(BaseLoader):
     """Extract plain text from CSV documents."""
 
-    def extract_text(self, file_path: str) -> str:
+    def load(self, file_path: Path) -> list[Document]:
         try:
             rows = []
 
@@ -18,9 +19,17 @@ class CSVLoader(BaseLoader):
                 for row in reader:
                     rows.append(" | ".join(cell.strip() for cell in row))
 
-            return "\n".join(rows).strip()
+            return [
+                Document(
+                    page_content="\n".join(rows).strip(),
+                    metadata={
+                        "source": str(file_path),
+                        "file_type": "csv",
+                    },
+                )
+            ]
 
         except Exception as e:
             raise ValueError(
-                f"Failed to extract text from CSV: {file_path}"
+                f"Failed to load CSV document: {file_path}"
             ) from e

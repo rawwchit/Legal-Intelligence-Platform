@@ -227,3 +227,26 @@ pnpm-debug.log*
 # Next.js
 .next/
 out/
+
+# Local Qdrant database
+backend/storage/qdrant/
+storage/qdrant/
+
+# SQLite databases
+*.sqlite
+
+# Lock files
+*.lock
+
+# macOS
+.DS_Store
+
+# Ignore dataset contents
+datasets/raw/*
+datasets/processed/*
+datasets/checkpoints/*
+
+# Keep folder structure
+!datasets/raw/.gitkeep
+!datasets/processed/.gitkeep
+!datasets/checkpoints/.gitkeep

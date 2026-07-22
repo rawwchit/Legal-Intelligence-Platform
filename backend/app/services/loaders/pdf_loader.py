@@ -1,4 +1,7 @@
+from pathlib import Path
+
 import fitz
+from langchain_core.documents import Document
 
 from app.services.loaders.base import BaseLoader
 
@@ -6,17 +9,31 @@ from app.services.loaders.base import BaseLoader
 class PDFLoader(BaseLoader):
     """Extract text from PDF documents using PyMuPDF."""
 
-    def extract_text(self, file_path: str) -> str:
+    def load(self, file_path: Path) -> list[Document]:
         try:
-            text = ""
+            documents: list[Document] = []
 
-            with fitz.open(file_path) as doc:
-                for page in doc:
-                    text += page.get_text()
+            with fitz.open(file_path) as pdf:
+                for page_number, page in enumerate(pdf, start=1):
+                    text = page.get_text().strip()
 
-            return text.strip()
+                    if not text:
+                        continue
+
+                    documents.append(
+                        Document(
+                            page_content=text,
+                            metadata={
+                                "source": str(file_path),
+                                "page": page_number,
+                                "file_type": "pdf",
+                            },
+                        )
+                    )
+
+            return documents
 
         except Exception as e:
             raise ValueError(
-                f"Failed to extract text from PDF: {file_path}"
+                f"Failed to load PDF document: {file_path}"
             ) from e

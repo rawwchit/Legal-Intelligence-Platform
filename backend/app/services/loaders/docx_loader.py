@@ -1,14 +1,17 @@
-from docx import Document
+from pathlib import Path
+
+from docx import Document as DocxDocument
+from langchain_core.documents import Document
 
 from app.services.loaders.base import BaseLoader
 
 
 class DOCXLoader(BaseLoader):
-    """Extract text from Microsoft Word (.docx) documents."""
+    """Load Microsoft Word (.docx) documents."""
 
-    def extract_text(self, file_path: str) -> str:
+    def load(self, file_path: Path) -> list[Document]:
         try:
-            document = Document(file_path)
+            document = DocxDocument(file_path)
 
             paragraphs = [
                 paragraph.text
@@ -16,9 +19,17 @@ class DOCXLoader(BaseLoader):
                 if paragraph.text.strip()
             ]
 
-            return "\n".join(paragraphs)
+            return [
+                Document(
+                    page_content="\n".join(paragraphs),
+                    metadata={
+                        "source": str(file_path),
+                        "file_type": "docx",
+                    },
+                )
+            ]
 
         except Exception as e:
             raise ValueError(
-                f"Failed to extract text from DOCX: {file_path}"
+                f"Failed to load DOCX document: {file_path}"
             ) from e
