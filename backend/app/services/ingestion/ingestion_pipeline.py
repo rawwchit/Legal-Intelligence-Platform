@@ -1,5 +1,3 @@
-
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -10,6 +8,7 @@ from app.services.ingestion.batch_indexer import BatchIndexer
 from app.services.ingestion.checkpoint_manager import CheckpointManager
 from app.services.ingestion.metadata import MetadataExtractor
 from app.services.ingestion.scanner import DatasetScanner
+from app.services.loaders.loader_factory import LoaderFactory
 
 
 class IngestionPipeline:
@@ -37,9 +36,24 @@ class IngestionPipeline:
 
         print(f"Found {len(files)} supported documents.")
 
-        for file_path in files:
-            metadata = self.metadata_extractor.extract(file_path)
-            print(f"Queued: {metadata['relative_path']}")
+        loaded_files = 0
+        loaded_documents = 0
+
+        for file in files:
+            loader = LoaderFactory.get_loader(file)
+            documents = loader.load(file)
+
+            loaded_files += 1
+            loaded_documents += len(documents)
+
+            print(f"Loaded: {file.name} -> {len(documents)} document(s)")
+
+        print("\nIngestion Summary")
+        print("-" * 40)
+        print(f"Files scanned     : {len(files)}")
+        print(f"Files loaded      : {loaded_files}")
+        print(f"Documents created : {loaded_documents}")
+        print("-" * 40)
 
             # TODO:
             # - Skip already indexed files using SHA256.
