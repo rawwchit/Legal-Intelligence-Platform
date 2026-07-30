@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 
 from langchain_core.documents import Document
-
+from app.services.parsing.parser_factory import ParserFactory
 from app.services.parsing.base_parser import BaseParser
 from app.services.parsing.models import (
     LegalDocumentNode,
