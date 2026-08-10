@@ -5,6 +5,7 @@ from fastapi import (
     Form,
     UploadFile,
 )
+from pathlib import Path
 from sqlalchemy.orm import Session
 
 from app.api.dependencies.roles import require_admin
@@ -13,7 +14,9 @@ from app.db.database import get_db
 from app.models.user import User
 from app.schemas.document import DocumentResponse
 from app.services.storage import save_uploaded_file
-from app.services.indexing_service import IndexingService
+from app.services.chunking.legal_chunker import LegalChunker
+from app.services.loaders.loader_factory import LoaderFactory
+from app.services.parsing.parser_factory import ParserFactory
 
 router = APIRouter()
 
@@ -45,14 +48,14 @@ def upload_document(
         uploaded_by=current_user.id,
     )
 
-    indexing_service = IndexingService()
+    path = Path(file_path)
+    documents = LoaderFactory.get_loader(path).load(path)
+    nodes = ParserFactory.get_parser(path).parse(documents)
+    chunks = LegalChunker().chunk(nodes)
 
-    chunk_count = indexing_service.index_document(
-        file_path=file_path,
-        document_id=document.id,
-        filename=file_name,
+    print(
+        f"Prepared {len(chunks)} legal chunks for document {document.id}; "
+        "vector indexing is disabled."
     )
-
-    print(f"Indexed {chunk_count} chunks for document {document.id}")
 
     return document
