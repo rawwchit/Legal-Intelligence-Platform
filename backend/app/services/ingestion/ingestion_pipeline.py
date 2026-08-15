@@ -8,6 +8,8 @@ from app.services.ingestion.metadata import MetadataExtractor
 from app.services.ingestion.scanner import DatasetScanner
 from app.services.loaders.loader_factory import LoaderFactory
 from app.services.parsing.parser_factory import ParserFactory
+from app.services.embeddings.base_embedder import BaseEmbedder
+from app.services.vectorstores.base_vectors import BaseVectorStore
 
 
 class IngestionPipeline:
@@ -17,6 +19,8 @@ class IngestionPipeline:
         self,
         dataset_path: str | Path,
         checkpoint_path: str | Path,
+        embedder: BaseEmbedder | None = None,
+        vector_store: BaseVectorStore | None = None,
     ):
         self.dataset_path = Path(dataset_path)
         self.checkpoint_path = Path(checkpoint_path)
@@ -26,9 +30,14 @@ class IngestionPipeline:
         self.checkpoint_manager = CheckpointManager(self.checkpoint_path)
 
         self.chunker = LegalChunker()
+        self.embedder = embedder
+        self.vector_store = vector_store
+
+        if (embedder is None) != (vector_store is None):
+            raise ValueError("embedder and vector_store must be provided together.")
 
     def run(self) -> list:
-        """Load, parse, and chunk corpus files; indexing is intentionally disabled."""
+        """Load, parse, chunk, and optionally index a legal corpus."""
         self.checkpoint_manager.load()
         files = self.scanner.scan()
 
@@ -62,5 +71,17 @@ class IngestionPipeline:
         print(f"Documents created : {loaded_documents}")
         print(f"Legal chunks      : {len(chunks)}")
         print("-" * 40)
-        print("Corpus parsing and chunking completed; indexing is disabled.")
+        if self.embedder and self.vector_store and chunks:
+            embeddings = self.embedder.embed([chunk.text for chunk in chunks])
+            self.vector_store.upsert(chunks, embeddings)
+            self.checkpoint_manager.save(
+                {
+                    "last_processed_file": str(files[-1]) if files else None,
+                    "documents_processed": loaded_documents,
+                    "chunks_indexed": len(chunks),
+                }
+            )
+            print("Corpus parsing, chunking, and indexing completed.")
+        else:
+            print("Corpus parsing and chunking completed; indexing is disabled.")
         return chunks
