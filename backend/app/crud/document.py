@@ -30,3 +30,7 @@ def create_document(
     db.refresh(document)
 
     return document
+
+
+def get_document(db: Session, document_id: int) -> Document | None:
+    return db.get(Document, document_id)

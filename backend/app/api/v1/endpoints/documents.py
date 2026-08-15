@@ -1,11 +1,12 @@
 from fastapi import (
     APIRouter,
+    BackgroundTasks,
     Depends,
     File,
     Form,
+    HTTPException,
     UploadFile,
 )
-from pathlib import Path
 from sqlalchemy.orm import Session
 
 from app.api.dependencies.roles import require_admin
@@ -14,9 +15,8 @@ from app.db.database import get_db
 from app.models.user import User
 from app.schemas.document import DocumentResponse
 from app.services.storage import save_uploaded_file
-from app.services.chunking.legal_chunker import LegalChunker
-from app.services.loaders.loader_factory import LoaderFactory
-from app.services.parsing.parser_factory import ParserFactory
+from app.services.document_indexing import DocumentIndexingService
+from app.crud.document import get_document
 
 router = APIRouter()
 
@@ -25,6 +25,7 @@ router = APIRouter()
     response_model=DocumentResponse,
 )
 def upload_document(
+    background_tasks: BackgroundTasks,
     title: str = Form(...),
     document_type: str = Form(...),
     court: str | None = Form(None),
@@ -48,14 +49,18 @@ def upload_document(
         uploaded_by=current_user.id,
     )
 
-    path = Path(file_path)
-    documents = LoaderFactory.get_loader(path).load(path)
-    nodes = ParserFactory.get_parser(path).parse(documents)
-    chunks = LegalChunker().chunk(nodes)
+    background_tasks.add_task(DocumentIndexingService().index, document.id)
 
-    print(
-        f"Prepared {len(chunks)} legal chunks for document {document.id}; "
-        "vector indexing is disabled."
-    )
+    return document
 
+
+@router.get("/{document_id}/indexing-status", response_model=DocumentResponse)
+def get_indexing_status(
+    document_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    document = get_document(db, document_id)
+    if document is None:
+        raise HTTPException(status_code=404, detail="Document not found")
     return document

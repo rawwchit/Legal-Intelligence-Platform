@@ -16,6 +16,8 @@ class DocumentResponse(DocumentBase):
     file_path: str
     uploaded_by: int
     created_at: datetime
+    indexing_status: str
+    chunks_indexed: int
+    indexing_error: str | None
 
     model_config = ConfigDict(from_attributes=True)
-    

@@ -35,4 +35,10 @@ class Document(Base):
         server_default=func.now(),
     )
 
+    indexing_status = Column(String, nullable=False, server_default="pending")
+
+    chunks_indexed = Column(Integer, nullable=False, server_default="0")
+
+    indexing_error = Column(String, nullable=True)
+
     uploader = relationship("User")
