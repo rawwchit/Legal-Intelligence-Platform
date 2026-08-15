@@ -13,16 +13,6 @@ on:
 jobs:
   quality:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
-    steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v7
-      - run: uv sync --group dev
-      - run: uv run ruff check .
-      - run: uv run pytest -q
-
     env:
       APP_NAME: "Legal Intelligence Platform"
       APP_VERSION: "0.1.0"
@@ -32,3 +22,12 @@ jobs:
       QDRANT_COLLECTION_NAME: "documents"
       DATABASE_URL: "sqlite:///./test.db"
       SECRET_KEY: "test-secret-key-for-ci"
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v7
+      - run: uv sync --group dev
+      - run: uv run ruff check .
+      - run: uv run pytest -q
