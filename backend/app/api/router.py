@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from app.api.v1.endpoints.health import router as health_router
 from app.api.v1.endpoints.auth import router as auth_router
 from app.api.v1.endpoints.documents import router as document_router
+from app.api.v1.endpoints.search import router as search_router
 
 router = APIRouter()
 
@@ -13,3 +14,4 @@ router.include_router(
     prefix="/api/v1/documents",
     tags=["Documents"],
 )
+router.include_router(search_router, prefix="/api/v1")
