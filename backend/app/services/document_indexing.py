@@ -56,6 +56,7 @@ class DocumentIndexingService:
                 embeddings = embedder.embed([chunk.text for chunk in chunks])
                 vector_store = self.vector_store or QdrantVectorStore(
                     url=settings.QDRANT_URL,
+                    path=settings.QDRANT_PATH,
                     collection_name=settings.QDRANT_COLLECTION_NAME,
                     vector_size=len(embeddings[0]),
                 )

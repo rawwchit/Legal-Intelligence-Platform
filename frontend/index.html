@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Search India’s legal corpus." />
+    <title>LexIntel — Legal Research</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/frontend/styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="hero">
+        <p class="eyebrow">LEXINTEL · INDIA</p>
+        <h1>Research the law<br /><em>with context.</em></h1>
+        <p class="hero-copy">Search your indexed corpus of statutes and constitutional provisions in plain language.</p>
+      </header>
+
+      <section class="search-panel" aria-label="Legal corpus search">
+        <form id="search-form">
+          <label class="sr-only" for="query">Search the legal corpus</label>
+          <div class="search-input-wrap">
+            <span aria-hidden="true">⌕</span>
+            <input id="query" name="query" type="search" placeholder="e.g. protection of life and personal liberty" required minlength="2" autofocus />
+            <button type="submit">Search</button>
+          </div>
+        </form>
+        <div class="suggestions" aria-label="Search examples">
+          <span>Try:</span>
+          <button type="button" data-query="Article 21 right to life">Article 21</button>
+          <button type="button" data-query="bail and arrest procedure">Bail and arrest</button>
+          <button type="button" data-query="data protection offences">Data protection</button>
+        </div>
+      </section>
+
+      <section id="results-section" class="results" aria-live="polite">
+        <div id="empty-state" class="empty-state">
+          <p class="result-kicker">READY TO RESEARCH</p>
+          <h2>Ask a legal question.</h2>
+          <p>Results will include the relevant passage, source document, and provision details.</p>
+        </div>
+        <div id="status" class="status" hidden></div>
+        <div id="results-list"></div>
+      </section>
+    </main>
+    <template id="result-template">
+      <article class="result-card">
+        <div class="result-meta">
+          <span class="source"></span>
+          <span class="score"></span>
+        </div>
+        <h2 class="result-title"></h2>
+        <p class="result-text"></p>
+        <footer class="tags"></footer>
+      </article>
+    </template>
+    <script src="/frontend/app.js"></script>
+  </body>
+</html>

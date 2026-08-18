@@ -16,13 +16,20 @@ class QdrantVectorStore(BaseVectorStore):
     def __init__(
         self,
         url: str | None = None,
+        path: str | None = None,
         collection_name: str = "legal-intelligence",
         vector_size: int = 384,
         client: QdrantClient | None = None,
     ) -> None:
         self.collection_name = collection_name
         self.vector_size = vector_size
-        self.client = client or QdrantClient(url=url or "http://localhost:6333")
+        self.client = client or self._create_client(url=url, path=path)
+
+    @staticmethod
+    def _create_client(url: str | None, path: str | None) -> QdrantClient:
+        if path:
+            return QdrantClient(path=path)
+        return QdrantClient(url=url or "http://localhost:6333")
 
     def _ensure_collection(self) -> None:
         if not self.client.collection_exists(self.collection_name):

@@ -35,3 +35,13 @@ def test_upsert_rejects_mismatched_vectors() -> None:
         assert "exactly one embedding" in str(error)
     else:
         raise AssertionError("Expected a ValueError")
+
+
+def test_uses_persistent_local_storage(tmp_path) -> None:
+    store = QdrantVectorStore(
+        collection_name="local-test",
+        vector_size=3,
+        path=str(tmp_path / "qdrant"),
+    )
+
+    assert store.client.collection_exists("local-test") is False

@@ -5,7 +5,8 @@ class Settings(BaseSettings):
     APP_ENV: str
     DEBUG: bool
     
-    QDRANT_URL: str
+    QDRANT_URL: str | None = None
+    QDRANT_PATH: str | None = None
     QDRANT_COLLECTION_NAME: str
     DATABASE_URL: str
     SECRET_KEY: str

@@ -4,11 +4,11 @@ A backend service for ingesting Indian legal material, converting it into struct
 
 ## Run locally
 
-1. Start Qdrant: `docker run -p 6333:6333 qdrant/qdrant`
-2. From `backend`, install dependencies with `uv sync --group dev`.
-3. Copy or configure `backend/.env`, then ingest the corpus with `uv run python scripts/ingest_corpus.py`.
+1. From `backend`, copy `.env.example` to `.env`, then install dependencies with `uv sync --group dev`.
+2. The default `QDRANT_PATH="storage/qdrant"` uses local persistent Qdrant storage; Docker is not required.
+3. Ingest the corpus with `uv run python -m scripts.ingest_corpus`.
 4. Start the API with `uv run uvicorn app.main:app --reload`.
 
-Search indexed material at `GET /api/v1/search?query=Article%2021`.
+Open `http://127.0.0.1:8000` to use the search interface. Search indexed material programmatically at `GET /api/v1/search?query=Article%2021`.
 
 Every push and pull request affecting the backend runs linting and tests in GitHub Actions.

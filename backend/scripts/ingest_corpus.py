@@ -28,6 +28,7 @@ def main() -> None:
         embedder=SentenceTransformerEmbedder(),
         vector_store=QdrantVectorStore(
             url=settings.QDRANT_URL,
+            path=settings.QDRANT_PATH,
             collection_name=settings.QDRANT_COLLECTION_NAME,
         ),
     )

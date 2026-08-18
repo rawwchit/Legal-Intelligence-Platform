@@ -17,6 +17,7 @@ def search_legal_corpus(
         embedding = EmbeddingService().embed_query(query)
         return QdrantVectorStore(
             url=settings.QDRANT_URL,
+            path=settings.QDRANT_PATH,
             collection_name=settings.QDRANT_COLLECTION_NAME,
             vector_size=len(embedding),
         ).search(embedding, limit)
